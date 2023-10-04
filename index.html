@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="em">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width" initial-scale="1.0">
+        <title> Send Data b/w Frontend & Backend</title>
+    
+        <style>
+          
+            body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .formContainer {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 50px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            
+        }
+
+        .formContainer label, .formContainer input {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .formContainer input[type="text"],
+        .formContainer input[type="email"],
+        .formContainer input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btnContainer {
+            text-align: center;
+        }
+
+        .btnContainer button {
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btnContainer button:hover {
+            background-color: #0056b3;
+        }
+
+        #responseTextArea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .bg{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: rgb(203, 231, 243);
+        }
+        </style>
+
+    </head>
+    <body>
+       
+        <div class="bg">
+            <form class="formContainer">
+                <label for="name">Name</label>
+                <input type="text" id="nameId" />
+        
+                <label for="email">Email</label>
+                <input type="email" id="emailId" />
+        
+                <label for="password">Password</label>
+                <input type="password" id="passwordId" />
+        
+                <div class="btnContainer">
+                    <button id="register">REGISTER</button>
+                    <button id="login">LOGIN</button>
+                    <button id="get">GET</button>
+                    <button id="put">PUT</button>
+                    <button id="delete">DELETE</button>
+                </div>
+                <textarea rows="10" cols="55" id="responseTextArea"></textarea>
+            </form>
+    
+        </div>
+
+ 
+        <script>
+            const getBtn = document.getElementById("get");
+            const registerBtn = document.getElementById("register");
+            const loginBtn = document.getElementById("login");
+            const putBtn = document.getElementById("put");
+            const deleteBtn = document.getElementById("delete");
+            const textareaEl = document.getElementById("responseTextArea");
+
+            const nameEl = document.getElementById("nameId");
+            const emailEl = document.getElementById("emailId");
+            const passwordEl = document.getElementById("passwordId");
+            
+            const baseUrl = "http://localhost:8383/";
+
+            const requestObjectBody = {
+                name:nameEl.value,
+                email:emailEl.value,
+                password:passwordEl.value,
+            }
+
+            nameEl.addEventListener("change",(event)=>{
+                requestObjectBody.name=event.target.value
+            });
+
+            emailEl.addEventListener("change",(event)=>{
+                requestObjectBody.email=event.target.value
+            });
+            passwordEl.addEventListener("change",(event)=>{
+                requestObjectBody.password=event.target.value
+            });
+            
+            registerBtn.addEventListener("click",async (event)=>{
+                event.preventDefault();
+                const response = await fetch(baseUrl+"insert",{
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body:JSON.stringify(requestObjectBody),
+                });
+                console.log(response);
+                // Check if the response status code indicates success (e.g., 200 OK)
+                if (response.ok) {
+                    // Parse the JSON response (if it's JSON)
+                    const responseData = await response.json();
+                    // Update the textarea with the parsed response data
+                    console.log(responseData);
+                    textareaEl.value = JSON.stringify(responseData);
+                } else {
+                    // Handle errors or non-OK response here
+                    textareaEl.value = "Error: Failed to fetch data from the server.";
+                }
+            });
+
+            loginBtn.addEventListener("click",async (event)=>{
+                event.preventDefault();
+                const response = await fetch(baseUrl+"login",{
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body:JSON.stringify(requestObjectBody),
+                });
+                console.log(response);
+                
+                if (response.ok) {
+                    // Parse the JSON response (if it's JSON)
+                    const responseData = await response.json();
+                    // Update the textarea with the parsed response data
+                    console.log(responseData);
+                    textareaEl.value = JSON.stringify(responseData);
+                } else {
+                    // Handle errors or non-OK response here
+                    textareaEl.value = "Error: Failed to fetch data from the server.";
+                }
+                /*
+                {
+                    rohit shyam,rohithshyam@#123,rohithshyam
+
+                "jwtToken":
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNmM5ZmZhMTYtZjlhOS00NDA2LTkzZjgtYjI4ODBmNzUxMDgzIiwiaWF0IjoxNjk2NDAxNzk0fQ.fkehFG_Xx2x9P3QxUyyFYW07XZmdo-CaCoIC56sK_lA"
+                }
+                */
+            });
+
+            getBtn.addEventListener("click", async (event)=>{
+                event.preventDefault();
+                const response = await fetch(baseUrl+"details",{
+                    method: "GET",
+                    headers: {
+                        Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNmM5ZmZhMTYtZjlhOS00NDA2LTkzZjgtYjI4ODBmNzUxMDgzIiwiaWF0IjoxNjk2NDAxNzk0fQ.fkehFG_Xx2x9P3QxUyyFYW07XZmdo-CaCoIC56sK_lA"
+                    },
+                });
+                console.log(response);
+                if (response.ok) {
+                    // Parse the JSON response (if it's JSON)
+                    const responseData = await response.json();
+                    // Update the textarea with the parsed response data
+                    console.log(responseData);
+                    textareaEl.value = JSON.stringify(responseData);
+                } else {
+                    // Handle errors or non-OK response here
+                    textareaEl.value = "Error: Failed to fetch data from the server.";
+                }
+            });
+
+            putBtn.addEventListener("click", async (event)=>{
+                event.preventDefault();
+                const response = await fetch(baseUrl+"update",{
+                    
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+
+                    body:JSON.stringify(requestObjectBody),
+                });
+                console.log(response);
+                if (response.ok) {
+                    textareaEl.value = "email Updated"
+                } else {
+                    // Handle errors or non-OK response here
+                    textareaEl.value = "Invalid user";
+                }
+            });
+
+            deleteBtn.addEventListener("click", async (event)=>{
+                event.preventDefault();
+                const response = await fetch(baseUrl+`delete/?name=${requestObjectBody.name}`,{
+                    method: "DELETE",
+                });
+                console.log(response);
+                if (response.ok) {
+                    textareaEl.value = "User Removed"
+                } else  {
+                    // Handle errors or non-OK response here
+                    textareaEl.value = "Invalid user";
+                }
+                
+            });
+
+
+        </script>
+    </body>
+</html>
